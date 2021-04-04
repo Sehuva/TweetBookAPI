@@ -1,4 +1,7 @@
 
+using System;
+using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +13,7 @@ using TweetBook.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
+using TweetBook.Installers;
 using TweetBook.Options;
 using TweetBook.Services;
 
@@ -27,6 +31,7 @@ namespace TweetBook
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //services.InstallServicesInAssembly(Configuration);
             services.AddControllersWithViews();
 
             services.AddDbContext<DataContext>(options =>
