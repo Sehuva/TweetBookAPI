@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using TweetBook.Options;
+using TweetBook.Services;
 
 namespace TweetBook
 {
@@ -39,6 +40,7 @@ namespace TweetBook
             });
 
             services.AddMvcCore().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddSingleton<IPostService, PostService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,7 +54,7 @@ namespace TweetBook
             {
                 app.UseHsts();
             }
-
+///
             var swaggerOptions = new SwaggerOptionsConfig();
             
             Configuration.GetSection(nameof(SwaggerOptionsConfig)).Bind(swaggerOptions);
