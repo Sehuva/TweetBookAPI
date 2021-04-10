@@ -1,35 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Cosmonaut;
+using Cosmonaut.Extensions;
 using TweetBook.Domain;
 
 namespace TweetBook.Services
 {
     public class CosmosPostService: IPostService
     {
-        public Task<List<Post>> GetPosts()
+        private readonly ICosmosStore<CosmosPostDTO> _cosmosStore;
+
+        public CosmosPostService(ICosmosStore<CosmosPostDTO> cosmosStore)
         {
-            throw new NotImplementedException();
+            _cosmosStore = cosmosStore;
         }
 
-        public Task<Post> GetPostById(Guid postId)
+        public async Task<List<Post>> GetPosts()
         {
-            throw new NotImplementedException();
+            var posts = await _cosmosStore.Query().ToListAsync();
+            return posts.Select(x => new Post {Id = Guid.Parse(x.Id), Name = x.Name}).ToList();
         }
 
-        public Task<bool> UpdatePost(Post postToUpdate)
+        public async Task<Post> GetPostById(Guid postId)
         {
-            throw new NotImplementedException();
+            var post = await _cosmosStore.FindAsync(postId.ToString(), postId.ToString());
+            return post == null ? null : new Post {Id = Guid.Parse(post.Id), Name = post.Name};
         }
 
-        public Task<bool> DeletePost(Guid postId)
+        public async Task<bool> UpdatePost(Post postToUpdate)
         {
-            throw new NotImplementedException();
+            var cosmosPost = new CosmosPostDTO
+            {
+                Id = postToUpdate.Id.ToString(),
+                Name = postToUpdate.Name
+            };
+            var result = await _cosmosStore.UpdateAsync(cosmosPost);
+            
+            return result.IsSuccess;
         }
 
-        public Task<bool> CreatePost(Post post)
+        public async Task<bool> DeletePost(Guid postId)
         {
-            throw new NotImplementedException();
+            var result = await _cosmosStore.RemoveByIdAsync(postId.ToString(), postId.ToString());
+            return result.IsSuccess;
+        }
+
+        public async Task<bool> CreatePost(Post post)
+        {
+            var cosmosPost = new CosmosPostDTO
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = post.Name
+            };
+            var result = await _cosmosStore.AddAsync(cosmosPost);
+            
+            return result.IsSuccess;
         }
     }
 }

@@ -14,6 +14,7 @@ namespace TweetBook.Services
 
         public PostService(DataContext dataContext)
         {
+            _dataContext = dataContext;
         }
         public async Task<List<Post>> GetPosts()
         {
@@ -45,9 +46,16 @@ namespace TweetBook.Services
 
         public async Task<bool> CreatePost(Post post)
         {
-            await _dataContext.Posts.AddAsync(post);
-            var created = await _dataContext.SaveChangesAsync();
-            return created > 0;
+            try
+            {
+                await _dataContext.Posts.AddAsync(post);
+                var created = await _dataContext.SaveChangesAsync();
+                return created > 0;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
     }
 }
